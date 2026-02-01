@@ -3,43 +3,43 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns 
-import regex as re
+
 
 # ======================
 # LOAD DATA (ONCE)
 # ======================
-df = pd.read_csv('startup_funding.csv')
-df.dropna(subset=['Amount in USD'], inplace=True)
-df['Amount in USD'] = (
-    df['Amount in USD']
-    .astype(str)
-    .str.replace(r'\D+', '', regex=True)
-)
+@st.cache_data
+def load_data():
+    df = pd.read_csv("startup_funding.csv")
 
-df = df[df['Amount in USD'] != '']
-df['Amount in USD'] = df['Amount in USD'].astype(int)
+    df.dropna(subset=['Amount in USD'], inplace=True)
+
+    df['Amount in USD'] = (
+        df['Amount in USD']
+        .astype(str)
+        .str.replace(r'\D+', '', regex=True)
+    )
+
+    df = df[df['Amount in USD'] != '']
+    df['Amount in USD'] = df['Amount in USD'].astype(int)
+
+    df['Investors Name'] = df['Investors Name'].astype('string')
+
+    df['Date dd/mm/yyyy'] = pd.to_datetime(
+        df['Date dd/mm/yyyy'],
+        format='%d/%m/%Y',
+        errors='coerce'
+    )
+
+    df['Year'] = df['Date dd/mm/yyyy'].dt.year
+    df['YearMonth'] = df['Date dd/mm/yyyy'].dt.to_period('M')
+
+    return df
 
 
+df = load_data()
 
 
-# ======================
-# CLEAN DATA
-# ======================
-df['Investors Name'] = df['Investors Name'].astype('string')
-
-df['Amount in USD'] = (
-    df['Amount in USD']
-    .astype(str)
-    .str.replace(',', '', regex=False)
-    .str.replace('$', '', regex=False)
-)
-
-df['Amount in USD'] = pd.to_numeric(df['Amount in USD'], errors='coerce')
-
-# Convert date
-df['Date dd/mm/yyyy'] = pd.to_datetime(df['Date dd/mm/yyyy'], format='%d/%m/%Y', errors='coerce')
-df['Year'] = df['Date dd/mm/yyyy'].dt.year
-df['YearMonth'] = df['Date dd/mm/yyyy'].dt.to_period('M')
 
 #Load investor Detail function
 def load_investor_details(investor):
