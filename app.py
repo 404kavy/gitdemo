@@ -72,7 +72,7 @@ def load_investor_details(investor):
     
     with col2:
         # Sector-wise pie chart
-        sector_invested = df[df['Investors Name'].str.contains(investor, na=False)].groupby('Industry Vertical').str.replace(r'\D+', '', regex=True)['Amount in USD'].sum().sort_values(ascending=False).head(8)
+        sector_invested = df[df['Investors Name'].str.contains(investor, na=False)].groupby('Industry Vertical')['Amount in USD'].sum().sort_values(ascending=False).head(8)
         fig, ax = plt.subplots(figsize=(8, 5))
         ax.pie(sector_invested.values, labels=sector_invested.index, autopct='%1.1f%%', startangle=90)
         ax.set_title("Investment Distribution by Sector")
